@@ -1,4 +1,6 @@
 const todoModel =require("../Models/model")
+const Model =require("../Models/todomodel")
+
 const jwt =require("jsonwebtoken")
 const bcryptjs =require("bcryptjs")
 
@@ -71,15 +73,13 @@ res.status(201).json({
     }
 }
 
-exports.changePassword=async(req,res)=>{
+exports.resetPass=async(req,res)=>{
     try {
         const {Password}=req.body
        const id =req.params.id
        const salt =bcryptjs.genSaltSync(10)
        const hash = bcryptjs.hashSync(Password,salt)
        const resetDetails={
-        // userId:req.body.userId,
-        // Token:req.body.Token,
         Password:hash
     }
         const result =await todoModel.findByIdAndUpdate(id,resetDetails,{Password:hash},{new:true})
@@ -95,26 +95,16 @@ exports.changePassword=async(req,res)=>{
                 data:result
             })
         }
-        const createToken =jwt.sign({
-            Password
-        },process.env.JWT_TOKEN,{expiresIn :"1d"})
-        check.Token =createToken
-        await check.save()
-        res.status(201).json({
-            status:"successful",
-            message:"password changed  successfully",
-            data:check
-        })
     } catch (error) {
         res.send(error.message)
       
         
     }
 }
-exports.getOne = async(req,res)=>{
+exports.getOneTodo = async(req,res)=>{
     try {
         const id = req.params.id
-        const getOne = await todoModel.findById(id)
+        const getOne = await Model.findById(id).populate("Tasks")
         if(!getOne){
             res.status(404).json({
                 message:`the todo with id ${id} is not found`
@@ -128,6 +118,9 @@ exports.getOne = async(req,res)=>{
         }
         
     } catch (error) {
+        res.status(500).json({
+            message:error.message
+        })
         
     }
 }
@@ -148,6 +141,7 @@ exports.getAll =async(req,res)=>{
 
         
     } catch (error) {
+        error.message
         
     }
 }

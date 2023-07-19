@@ -19,9 +19,10 @@ const todoList = new mongoose.Schema({
     isAdmin:{
         type:Boolean
     },
-    Tasks:{
-        type:Array
-    },
+    Tasks:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Task"
+    }],
 },{timestamps:true})
 
 const todo =mongoose.model("todo",todoList)
